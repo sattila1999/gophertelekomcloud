@@ -54,3 +54,29 @@ func WaitForClusterToExtend(client *golangsdk.ServiceClient, id string, timeout 
 		return false, fmt.Errorf("unexpected cluster actions: %v; progress: %v", cluster.Actions, cluster.ActionProgress)
 	})
 }
+
+func WaitForCluster(client *golangsdk.ServiceClient, id string, timeout int) error {
+	return golangsdk.WaitFor(timeout, func() (bool, error) {
+		cluster, err := Get(client, id)
+		if err != nil {
+			if _, ok := err.(golangsdk.BaseError); ok {
+				return true, err
+			}
+			log.Printf("Error waiting for CSS cluster to end active task: %s", err) // ignore connection-related errors
+			return false, nil
+		}
+		// No active action
+		if len(cluster.Actions) == 0 {
+			return true, nil
+		}
+		// if cluster.Actions[0] == "RESIZING_FLAVOR" {
+		// 	time.Sleep(30 * time.Second) // make a bigger wait if it's not ready
+		// 	return false, nil
+		// }
+		if len(cluster.Actions[0]) != 0 {
+			time.Sleep(30 * time.Second) // make a bigger wait if it's not ready
+			return false, nil
+		}
+		return false, fmt.Errorf("unexpected cluster actions: %v; progress: %v", cluster.Actions, cluster.ActionProgress)
+	})
+}
