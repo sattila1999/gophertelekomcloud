@@ -13,8 +13,10 @@ func TestUpdateSecurityModeEnableAll(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	if clusterID == "" {
-		t.Skip("CSS_CLUSTER_ID needs to be defined.")
+	adminPWD := os.Getenv("CSS_ADMIN_PASSWORD")
+
+	if clusterID == "" || adminPWD == "" {
+		t.Skip("CSS_CLUSTER_ID and CSS_ADMIN_PASSWORD need to be defined.")
 	}
 
 	cssCluster, err := clusters.Get(client, clusterID)
@@ -30,16 +32,14 @@ func TestUpdateSecurityModeEnableAll(t *testing.T) {
 		t.Skip("The HTTPS and the Authority is already enabled.")
 	}
 
-	var adminPWD string = "P4s77gfhz!+%"
-
 	err = clusters.UpdateSecurityMode(client, clusterID, clusters.SecurityModeOpts{
-		AuthorityEnable: authEnable,
-		AdminPwd:        adminPWD,
-		HttpsEnable:     httpsEnable,
+		AuthorityEnabled: authEnable,
+		AdminPassword:    adminPWD,
+		HttpsEnabled:     httpsEnable,
 	})
 	th.AssertNoErr(t, err)
 
-	th.AssertNoErr(t, clusters.WaitForClusterOperationSucces(client, clusterID, timeout))
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 
 }
 
@@ -65,12 +65,12 @@ func TestUpdateSecurityModeDisableAll(t *testing.T) {
 	}
 
 	err = clusters.UpdateSecurityMode(client, clusterID, clusters.SecurityModeOpts{
-		AuthorityEnable: authEnable,
-		HttpsEnable:     httpsEnable,
+		AuthorityEnabled: authEnable,
+		HttpsEnabled:     httpsEnable,
 	})
 	th.AssertNoErr(t, err)
 
-	th.AssertNoErr(t, clusters.WaitForClusterOperationSucces(client, clusterID, timeout))
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 
 }
 
@@ -78,8 +78,10 @@ func TestUpdateSecurityModeEnableHttps(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	if clusterID == "" {
-		t.Skip("CSS_CLUSTER_ID needs to be defined.")
+	adminPWD := os.Getenv("CSS_ADMIN_PASSWORD")
+
+	if clusterID == "" || adminPWD == "" {
+		t.Skip("CSS_CLUSTER_ID and CSS_ADMIN_PASSWORD need to be defined.")
 	}
 
 	cssCluster, err := clusters.Get(client, clusterID)
@@ -93,17 +95,16 @@ func TestUpdateSecurityModeEnableHttps(t *testing.T) {
 		t.Skip("HTTPS is already enabled.")
 	}
 
-	var adminPWD string = "P4s77gfhz!+%"
 	var authEnable bool = true
 
 	err = clusters.UpdateSecurityMode(client, clusterID, clusters.SecurityModeOpts{
-		AuthorityEnable: authEnable,
-		AdminPwd:        adminPWD,
-		HttpsEnable:     httpsEnable,
+		AuthorityEnabled: authEnable,
+		AdminPassword:    adminPWD,
+		HttpsEnabled:     httpsEnable,
 	})
 	th.AssertNoErr(t, err)
 
-	th.AssertNoErr(t, clusters.WaitForClusterOperationSucces(client, clusterID, timeout))
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 
 }
 
@@ -111,8 +112,10 @@ func TestUpdateSecurityModeEnableAuthority(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	if clusterID == "" {
-		t.Skip("CSS_CLUSTER_ID needs to be defined.")
+	adminPWD := os.Getenv("CSS_ADMIN_PASSWORD")
+
+	if clusterID == "" || adminPWD == "" {
+		t.Skip("CSS_CLUSTER_ID and CSS_ADMIN_PASSWORD need to be defined.")
 	}
 
 	cssCluster, err := clusters.Get(client, clusterID)
@@ -126,16 +129,15 @@ func TestUpdateSecurityModeEnableAuthority(t *testing.T) {
 		t.Skip("Authority is already enabled.")
 	}
 
-	var adminPWD string = "P4s77gfhz!+%"
 	var httpsEnable bool = false
 
 	err = clusters.UpdateSecurityMode(client, clusterID, clusters.SecurityModeOpts{
-		AuthorityEnable: authEnable,
-		AdminPwd:        adminPWD,
-		HttpsEnable:     httpsEnable,
+		AuthorityEnabled: authEnable,
+		AdminPassword:    adminPWD,
+		HttpsEnabled:     httpsEnable,
 	})
 	th.AssertNoErr(t, err)
 
-	th.AssertNoErr(t, clusters.WaitForClusterOperationSucces(client, clusterID, timeout))
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 
 }

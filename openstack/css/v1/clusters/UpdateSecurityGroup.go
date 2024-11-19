@@ -17,7 +17,7 @@ func UpdateSecurityGroup(client *golangsdk.ServiceClient, clusterID string, opts
 		return err
 	}
 
-	url := client.ServiceURL("clusters", clusterID, "sg/change")
+	url := client.ServiceURL("clusters", clusterID, "sg", "change")
 
 	_, err = client.Post(url, b, nil, &golangsdk.RequestOpts{
 		OkCodes: []int{200},

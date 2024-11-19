@@ -62,19 +62,16 @@ func WaitForCluster(client *golangsdk.ServiceClient, id string, timeout int) err
 			if _, ok := err.(golangsdk.BaseError); ok {
 				return true, err
 			}
-			log.Printf("Error waiting for CSS cluster to end active task: %s", err) // ignore connection-related errors
+			log.Printf("Error waiting for CSS cluster to end active task: %s", err)
 			return false, nil
 		}
-		// No active action
+
 		if len(cluster.Actions) == 0 {
 			return true, nil
 		}
-		// if cluster.Actions[0] == "RESIZING_FLAVOR" {
-		// 	time.Sleep(30 * time.Second) // make a bigger wait if it's not ready
-		// 	return false, nil
-		// }
+
 		if len(cluster.Actions[0]) != 0 {
-			time.Sleep(30 * time.Second) // make a bigger wait if it's not ready
+			time.Sleep(30 * time.Second)
 			return false, nil
 		}
 		return false, fmt.Errorf("unexpected cluster actions: %v; progress: %v", cluster.Actions, cluster.ActionProgress)
