@@ -14,14 +14,14 @@ func TestUpdateClusterFlavor(t *testing.T) {
 	th.AssertNoErr(t, err)
 
 	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	flavorID := os.Getenv("CSS_NEW_FLAVOR_ID")
-	if clusterID == "" || flavorID == "" {
-		t.Skip("CSS_CLUSTER_ID and CSS_NEW_FALVOR_ID need to be defined")
+	flavor := os.Getenv("CSS_NEW_FLAVOR")
+	if clusterID == "" || flavor == "" {
+		t.Skip("CSS_CLUSTER_ID and CSS_NEW_FALVOR need to be defined")
 	}
 
-	err = clusters.UpdateClusterFlavor(client, clusterID, flavorID, clusters.ClusterFlavorOpts{
+	err = clusters.UpdateClusterFlavor(client, clusterID, flavor, clusters.ClusterFlavorOpts{
 		NeedCheckReplica: false,
-		FlavorID:         flavorID,
+		Flavor:           flavor,
 	})
 	th.AssertNoErr(t, err)
 
@@ -33,15 +33,16 @@ func TestUpdateClusterNodeFlavor(t *testing.T) {
 	th.AssertNoErr(t, err)
 
 	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	flavorID := os.Getenv("CSS_NEW_FLAVOR_ID")
-	if clusterID == "" || flavorID == "" {
-		t.Skip("CSS_CLUSTER_ID and CSS_FLAVOR_ID need to be defined")
+	flavor := os.Getenv("CSS_NEW_FLAVOR")
+	nodeType := os.Getenv("CSS_NODE_TYPE")
+	if clusterID == "" || flavor == "" || nodeType == "" {
+		t.Skip("CSS_CLUSTER_ID, CSS_NEW_FLAVOR, and CSS_NODE_TYPE need to be defined")
 	}
 
-	err = clusters.UpdateClusterFlavor(client, clusterID, flavorID, clusters.ClusterNodeFlavorOpts{
+	err = clusters.UpdateClusterFlavor(client, clusterID, flavor, clusters.ClusterNodeFlavorOpts{
 		NeedCheckReplica: false,
-		FlavorID:         flavorID,
-		Type:             "ess-master",
+		Flavor:           flavor,
+		Type:             nodeType,
 	})
 	th.AssertNoErr(t, err)
 
