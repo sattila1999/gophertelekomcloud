@@ -17,9 +17,7 @@ func TestAddClusterNodes(t *testing.T) {
 	clusterID := getEnvVar("CSS_CLUSTER_ID")
 
 	_, err = clusters.AddClusterNodes(client, clusterID, nodeType, clusters.AddNodesOpts{
-		// css.medium.8: ced8d1a7-eff8-4e30-a3de-cd9578fd518f
-		// css.xlarge.2: d9dc06ae-b9c4-4ef4-acd8-953ef4205e27
-		Flavor:     "d9dc06ae-b9c4-4ef4-acd8-953ef4205e27",
+		Flavor:     "css.xlarge.2",
 		NodeSize:   1,
 		VolumeType: "HIGH",
 	})
