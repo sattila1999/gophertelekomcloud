@@ -2,6 +2,7 @@ package v1
 
 import (
 	"log"
+	"os"
 	"testing"
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
@@ -12,6 +13,14 @@ import (
 )
 
 const timeout = 1200
+
+func getEnvVar(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		panic("Missing required environment variable: " + key)
+	}
+	return value
+}
 
 func TestClusterWorkflow(t *testing.T) {
 	client, err := clients.NewCssV1Client()

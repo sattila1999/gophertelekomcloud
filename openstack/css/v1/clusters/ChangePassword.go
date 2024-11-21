@@ -1,6 +1,9 @@
 package clusters
 
-import golangsdk "github.com/opentelekomcloud/gophertelekomcloud"
+import (
+	golangsdk "github.com/opentelekomcloud/gophertelekomcloud"
+	"github.com/opentelekomcloud/gophertelekomcloud/internal/build"
+)
 
 type ChangePasswordOpts struct {
 	// DisplayName contains options for new name
@@ -8,14 +11,14 @@ type ChangePasswordOpts struct {
 	NewPassword string `json:"newpassword" required:"true"`
 }
 
-func ChangePassword(client *golangsdk.ServiceClient, opts ChangePasswordOpts, clusterId string) (err error) {
+func ChangePassword(client *golangsdk.ServiceClient, clusterID string, opts ChangePasswordOpts) (err error) {
 	// ChangeClusterName will change cluster name based on ChangeClusterNameOpts
-	b, err := golangsdk.BuildRequestBody(opts, "")
+	b, err := build.RequestBody(opts, "")
 	if err != nil {
-		return
+		return err
 	}
 
-	_, err = client.Post(client.ServiceURL("clusters", clusterId, "password/reset"), b, nil, &golangsdk.RequestOpts{
+	_, err = client.Post(client.ServiceURL("clusters", clusterID, "password", "reset"), b, nil, &golangsdk.RequestOpts{
 		OkCodes: []int{200},
 	})
 	return

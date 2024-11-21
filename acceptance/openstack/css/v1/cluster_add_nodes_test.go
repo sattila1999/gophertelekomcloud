@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"os"
 	"testing"
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
@@ -15,10 +14,7 @@ func TestAddClusterNodes(t *testing.T) {
 
 	nodeType := "ess-client"
 
-	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	if clusterID == "" {
-		t.Skip("CSS_CLUSTER_ID needs to be defined")
-	}
+	clusterID := getEnvVar("CSS_CLUSTER_ID")
 
 	_, err = clusters.AddClusterNodes(client, clusterID, nodeType, clusters.AddNodesOpts{
 		// css.medium.8: ced8d1a7-eff8-4e30-a3de-cd9578fd518f

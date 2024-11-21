@@ -1,6 +1,9 @@
 package clusters
 
-import golangsdk "github.com/opentelekomcloud/gophertelekomcloud"
+import (
+	golangsdk "github.com/opentelekomcloud/gophertelekomcloud"
+	"github.com/opentelekomcloud/gophertelekomcloud/internal/build"
+)
 
 type ChangeClusterNameOpts struct {
 	// DisplayName contains options for new name
@@ -8,15 +11,15 @@ type ChangeClusterNameOpts struct {
 	DisplayName string `json:"displayName" required:"true"`
 }
 
-func ChangeClusterName(client *golangsdk.ServiceClient, opts ChangeClusterNameOpts, clusterId string) (err error) {
+func ChangeClusterName(client *golangsdk.ServiceClient, clusterID string, opts ChangeClusterNameOpts) error {
 	// ChangeClusterName will change cluster name based on ChangeClusterNameOpts
-	b, err := golangsdk.BuildRequestBody(opts, "")
+	b, err := build.RequestBody(opts, "")
 	if err != nil {
-		return
+		return err
 	}
 
-	_, err = client.Post(client.ServiceURL("clusters", clusterId, "changename"), b, nil, &golangsdk.RequestOpts{
+	_, err = client.Post(client.ServiceURL("clusters", clusterID, "changename"), b, nil, &golangsdk.RequestOpts{
 		OkCodes: []int{200},
 	})
-	return
+	return err
 }

@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"os"
 	"testing"
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
@@ -14,17 +13,13 @@ func TestChangePasswordWorkflow(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	clusterID := os.Getenv("CSS_CLUSTER_ID")
-
-	if clusterID == "" {
-		t.Skip("`CSS_CLUSTER_ID` need to be defined")
-	}
+	clusterID := getEnvVar("CSS_CLUSTER_ID")
 
 	opts := clusters.ChangePasswordOpts{
 
 		NewPassword: tools.RandomString("newpass-css-", 4),
 	}
-	err = clusters.ChangePassword(client, opts, clusterID)
+	err = clusters.ChangePassword(client, clusterID, opts)
 
 	th.AssertNoErr(t, err)
 }

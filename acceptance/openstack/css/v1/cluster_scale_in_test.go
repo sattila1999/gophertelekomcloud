@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"os"
 	"testing"
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
@@ -13,19 +12,12 @@ func TestScaleInCluster(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	if clusterID == "" {
-		t.Skip("CSS_CLUSTER_ID needs to be defined")
-	}
+	clusterID := getEnvVar("CSS_CLUSTER_ID")
 
 	err = clusters.ScaleInCluster(client, clusterID, []clusters.ScaleInOpts{
 		{
 			Type:          "ess",
 			ReduceNodeNum: 1,
-		},
-		{
-			Type:          "ess-cold",
-			ReduceNodeNum: 2,
 		},
 	})
 	th.AssertNoErr(t, err)

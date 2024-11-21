@@ -12,12 +12,9 @@ import (
 func TestUpdateSecurityModeEnableAll(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
-	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	adminPWD := os.Getenv("CSS_ADMIN_PASSWORD")
 
-	if clusterID == "" || adminPWD == "" {
-		t.Skip("CSS_CLUSTER_ID and CSS_ADMIN_PASSWORD need to be defined.")
-	}
+	clusterID := getEnvVar("CSS_CLUSTER_ID")
+	adminPWD := getEnvVar("CSS_ADMIN_PASSWORD")
 
 	cssCluster, err := clusters.Get(client, clusterID)
 	th.AssertNoErr(t, err)

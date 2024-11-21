@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"os"
 	"testing"
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
@@ -13,11 +12,8 @@ func TestUpdateSecurityGroup(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	clusterID := os.Getenv("CSS_CLUSTER_ID")
-	sgID := os.Getenv("SECURITY_GROUP_ID")
-	if clusterID == "" || sgID == "" {
-		t.Skip("Both CSS_CLUSTER_ID and SECURITY_GROUP_ID needs to be defined")
-	}
+	clusterID := getEnvVar("CSS_CLUSTER_ID")
+	sgID := getEnvVar("SECURITY_GROUP_ID")
 
 	err = clusters.UpdateSecurityGroup(client, clusterID, clusters.SecurityGroupOpts{
 		SecurityGroupID: sgID,
