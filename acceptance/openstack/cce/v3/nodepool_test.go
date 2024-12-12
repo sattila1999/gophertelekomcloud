@@ -100,13 +100,17 @@ func TestNodePoolLifecycle(t *testing.T) {
 		},
 	}
 
-	nodePool, err := nodepools.Create(client, clusterId, createOpts).Extract()
+	existingNodepools, err := nodepools.List(client, clusterId, nodepools.ListOpts{})
+	th.AssertNoErr(t, err)
+	numExistingNodepools := len(existingNodepools)
+
+	nodePool, err := nodepools.Create(client, clusterId, createOpts)
 	th.AssertNoErr(t, err)
 
 	nodeId := nodePool.Metadata.Id
 
 	th.AssertNoErr(t, golangsdk.WaitFor(1800, func() (bool, error) {
-		n, err := nodepools.Get(client, clusterId, nodeId).Extract()
+		n, err := nodepools.Get(client, clusterId, nodeId)
 		if err != nil {
 			return false, err
 		}
@@ -117,7 +121,11 @@ func TestNodePoolLifecycle(t *testing.T) {
 		return false, nil
 	}))
 
-	pool, err := nodepools.Get(client, clusterId, nodeId).Extract()
+	nodepoolList, err := nodepools.List(client, clusterId, nodepools.ListOpts{})
+	th.AssertNoErr(t, err)
+	th.AssertEquals(t, numExistingNodepools+1, len(nodepoolList))
+
+	pool, err := nodepools.Get(client, clusterId, nodeId)
 	th.AssertNoErr(t, err)
 	th.AssertEquals(t, 55, pool.Spec.NodeTemplate.ExtendParam.MaxPods)
 	// Not supported params by now
@@ -133,11 +141,11 @@ func TestNodePoolLifecycle(t *testing.T) {
 			NodeTemplate:     nodepools.UpdateNodeTemplate{},
 		},
 	}
-	updatedPool, err := nodepools.Update(client, clusterId, nodeId, updateOpts).Extract()
+	updatedPool, err := nodepools.Update(client, clusterId, nodeId, updateOpts)
 	th.AssertNoErr(t, err)
 	th.AssertEquals(t, "nodepool-test-updated", updatedPool.Metadata.Name)
 	th.AssertNoErr(t, golangsdk.WaitFor(1800, func() (bool, error) {
-		n, err := nodepools.Get(client, clusterId, nodeId).Extract()
+		n, err := nodepools.Get(client, clusterId, nodeId)
 		if err != nil {
 			return false, err
 		}
@@ -148,10 +156,10 @@ func TestNodePoolLifecycle(t *testing.T) {
 		return false, nil
 	}))
 
-	th.AssertNoErr(t, nodepools.Delete(client, clusterId, nodeId).ExtractErr())
+	th.AssertNoErr(t, nodepools.Delete(client, clusterId, nodeId))
 
 	err = golangsdk.WaitFor(1800, func() (bool, error) {
-		_, err := nodepools.Get(client, clusterId, nodeId).Extract()
+		_, err := nodepools.Get(client, clusterId, nodeId)
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
 				return true, nil
