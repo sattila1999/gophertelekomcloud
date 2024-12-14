@@ -7,11 +7,11 @@ import (
 
 type SecurityModeOpts struct {
 	// Indicates whether to enable the security mode.
-	AuthorityEnabled bool `json:"authorityEnable"`
+	AuthorityEnabled *bool `json:"authorityEnable"`
 	// Cluster password.
 	AdminPassword string `json:"adminPwd"`
 	// Indicates whether to enable HTTPS.
-	HttpsEnabled bool `json:"httpsEnable"`
+	HttpsEnabled *bool `json:"httpsEnable"`
 }
 
 // UpdateSecurityMode - change the security mode of a cluster.

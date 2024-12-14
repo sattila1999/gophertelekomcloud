@@ -5,41 +5,108 @@ import (
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
 	"github.com/opentelekomcloud/gophertelekomcloud/openstack/css/v1/clusters"
+	"github.com/opentelekomcloud/gophertelekomcloud/openstack/css/v1/flavors"
 	th "github.com/opentelekomcloud/gophertelekomcloud/testhelper"
 )
 
 func TestUpdateClusterFlavor(t *testing.T) {
+	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
+	if clusterID == "" {
+		t.Skip("`CSS_CLUSTER_ID` must be defined")
+	}
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	clusterID := getEnvVar("CSS_CLUSTER_ID")
-	flavor := getEnvVar("CSS_NEW_FLAVOR")
+	cluster, err := clusters.Get(client, clusterID)
+	th.AssertNoErr(t, err)
 
-	err = clusters.UpdateClusterFlavor(client, clusterID, flavor, clusters.ClusterFlavorOpts{
+	var (
+		currentFlavor string
+		newFlavorID   string
+		instanceType  string = "ess"
+	)
+
+	for _, instance := range cluster.Instances {
+		if instance.Type == instanceType {
+			currentFlavor = instance.SpecCode
+			break
+		}
+	}
+
+	filterOpts := flavors.FilterOpts{
+		Version: cluster.Datastore.Version,
+		Type:    instanceType,
+	}
+
+	versions, err := flavors.List(client)
+	th.AssertNoErr(t, err)
+
+	filteredVersions := flavors.FilterVersions(versions, filterOpts)
+	if filteredVersions[0].Flavors[0].Name != currentFlavor {
+		newFlavorID = filteredVersions[0].Flavors[0].FlavorID
+	} else {
+		newFlavorID = filteredVersions[0].Flavors[1].FlavorID
+	}
+
+	err = clusters.UpdateClusterFlavor(client, clusterID, clusters.ClusterFlavorOpts{
 		NeedCheckReplica: false,
-		Flavor:           flavor,
+		NewFlavorID:      newFlavorID,
 	})
 	th.AssertNoErr(t, err)
 
-	timeout := 600
 	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 }
 
 func TestUpdateClusterNodeFlavor(t *testing.T) {
+	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
+	if clusterID == "" {
+		t.Skip("`CSS_CLUSTER_ID` must be defined")
+	}
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	clusterID := getEnvVar("CSS_CLUSTER_ID")
-	flavor := getEnvVar("CSS_NEW_FLAVOR")
-	nodeType := getEnvVar("CSS_NODE_TYPE")
+	cluster, err := clusters.Get(client, clusterID)
+	th.AssertNoErr(t, err)
 
-	err = clusters.UpdateClusterFlavor(client, clusterID, flavor, clusters.ClusterNodeFlavorOpts{
+	var (
+		currentFlavor string
+		newFlavorID   string
+		instanceType  string
+	)
+
+	for _, instance := range cluster.Instances {
+		if instance.Type == "ess-cold" || instance.Type == "ess-client" || instance.Type == "ess-master" {
+			currentFlavor = instance.SpecCode
+			instanceType = instance.Type
+			break
+		}
+	}
+
+	if instanceType == "" {
+		t.Skip("There are no client, cold or master nodes to change the flavor.")
+	}
+
+	filterOpts := flavors.FilterOpts{
+		Version: cluster.Datastore.Version,
+		Type:    instanceType,
+	}
+
+	versions, err := flavors.List(client)
+	th.AssertNoErr(t, err)
+
+	filteredVersions := flavors.FilterVersions(versions, filterOpts)
+	if filteredVersions[0].Flavors[0].Name != currentFlavor {
+		newFlavorID = filteredVersions[0].Flavors[0].FlavorID
+	} else {
+		newFlavorID = filteredVersions[0].Flavors[1].FlavorID
+	}
+
+	err = clusters.UpdateClusterFlavor(client, clusterID, clusters.ClusterNodeFlavorOpts{
 		NeedCheckReplica: false,
-		Flavor:           flavor,
-		Type:             nodeType,
+		NewFlavorID:      newFlavorID,
+		NodeType:         instanceType,
 	})
 	th.AssertNoErr(t, err)
 
-	timeout := 600
 	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 }

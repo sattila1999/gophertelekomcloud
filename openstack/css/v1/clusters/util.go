@@ -62,7 +62,7 @@ func WaitForCluster(client *golangsdk.ServiceClient, id string, timeout int) err
 			if _, ok := err.(golangsdk.BaseError); ok {
 				return true, err
 			}
-			log.Printf("Error waiting for CSS cluster to end active task: %s", err)
+			log.Printf("Error while waiting for cluster's status to change to active: %s", err)
 			return false, nil
 		}
 

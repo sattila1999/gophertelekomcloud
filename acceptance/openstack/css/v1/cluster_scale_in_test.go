@@ -9,10 +9,12 @@ import (
 )
 
 func TestScaleInCluster(t *testing.T) {
+	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
+	if clusterID == "" {
+		t.Skip("`CSS_CLUSTER_ID` must be defined")
+	}
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
-
-	clusterID := getEnvVar("CSS_CLUSTER_ID")
 
 	err = clusters.ScaleInCluster(client, clusterID, []clusters.ScaleInOpts{
 		{
