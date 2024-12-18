@@ -19,4 +19,6 @@ func TestRestartClusterWorkflow(t *testing.T) {
 
 	err = clusters.RestartCluster(client, clusterID)
 	th.AssertNoErr(t, err)
+
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, 1200))
 }
