@@ -11,6 +11,7 @@ type ChangePasswordOpts struct {
 	NewPassword string `json:"newpassword" required:"true"`
 }
 
+// ChangePassword function is used to change the password of a cluster.
 func ChangePassword(client *golangsdk.ServiceClient, clusterID string, opts ChangePasswordOpts) (err error) {
 	// ChangeClusterName will change cluster name based on ChangeClusterNameOpts
 	b, err := build.RequestBody(opts, "")

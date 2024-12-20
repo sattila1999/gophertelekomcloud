@@ -11,6 +11,7 @@ type ChangeClusterNameOpts struct {
 	DisplayName string `json:"displayName" required:"true"`
 }
 
+// ChangeClusterName function is used to change the name of a cluster.
 func ChangeClusterName(client *golangsdk.ServiceClient, clusterID string, opts ChangeClusterNameOpts) error {
 	// ChangeClusterName will change cluster name based on ChangeClusterNameOpts
 	b, err := build.RequestBody(opts, "")

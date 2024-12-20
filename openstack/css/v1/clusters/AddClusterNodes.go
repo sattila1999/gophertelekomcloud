@@ -6,7 +6,7 @@ import (
 	"github.com/opentelekomcloud/gophertelekomcloud/internal/extract"
 )
 
-// ScaleInOpts defines options for scaling in a cluster.
+// AddNodesOpts defines options to add master or client nodes .
 type AddNodesOpts struct {
 	// NodeSize - Number of nodes. The value range is 1 to 32.
 	// If the node type is ess-master, the number of nodes must be an odd number in the range 3 to 10.
@@ -22,6 +22,7 @@ type AddNodesOpts struct {
 	VolumeType string `json:"volume_type" required:"true"`
 }
 
+// AddClusterNodes function lets you add master and client nodes to a cluster.
 func AddClusterNodes(client *golangsdk.ServiceClient, clusterID string, NodeType string, opts AddNodesOpts) (*AddNodesResponse, error) {
 
 	b, err := build.RequestBody(opts, "type")

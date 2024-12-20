@@ -34,7 +34,7 @@ func TestUpdateClusterFlavor(t *testing.T) {
 	}
 
 	filterOpts := flavors.FilterOpts{
-		Version: cluster.Datastore.Version,
+		Version: "7.10.2",
 		Type:    instanceType,
 	}
 
@@ -47,9 +47,9 @@ func TestUpdateClusterFlavor(t *testing.T) {
 	} else {
 		newFlavorID = filteredVersions[0].Flavors[1].FlavorID
 	}
-
+	needCheckReplica := false
 	err = clusters.UpdateClusterFlavor(client, clusterID, clusters.ClusterFlavorOpts{
-		NeedCheckReplica: false,
+		NeedCheckReplica: &needCheckReplica,
 		NewFlavorID:      newFlavorID,
 	})
 	th.AssertNoErr(t, err)
@@ -87,7 +87,7 @@ func TestUpdateClusterNodeFlavor(t *testing.T) {
 	}
 
 	filterOpts := flavors.FilterOpts{
-		Version: cluster.Datastore.Version,
+		Version: "7.10.2",
 		Type:    instanceType,
 	}
 
@@ -101,8 +101,9 @@ func TestUpdateClusterNodeFlavor(t *testing.T) {
 		newFlavorID = filteredVersions[0].Flavors[1].FlavorID
 	}
 
-	err = clusters.UpdateClusterFlavor(client, clusterID, clusters.ClusterNodeFlavorOpts{
-		NeedCheckReplica: false,
+	needCheckReplica := false
+	err = clusters.UpdateClusterFlavor(client, clusterID, clusters.ClusterFlavorOpts{
+		NeedCheckReplica: &needCheckReplica,
 		NewFlavorID:      newFlavorID,
 		NodeType:         instanceType,
 	})
