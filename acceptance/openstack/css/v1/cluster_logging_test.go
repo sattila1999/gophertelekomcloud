@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/clients"
+	"github.com/opentelekomcloud/gophertelekomcloud/acceptance/tools"
 	"github.com/opentelekomcloud/gophertelekomcloud/openstack/css/v1/clusters"
 	"github.com/opentelekomcloud/gophertelekomcloud/openstack/css/v1/logs"
 	th "github.com/opentelekomcloud/gophertelekomcloud/testhelper"
@@ -30,6 +31,7 @@ func TestCSSLogging(t *testing.T) {
 
 	got, err := logs.GetLogConfiguration(client, clusterID)
 	th.AssertNoErr(t, err)
+	tools.PrintResource(t, got)
 	// log.Print("Creating cluster, ID: ", got)
 	if got.LogSwitch {
 		fmt.Print("The logs are already enabled.")
@@ -62,4 +64,45 @@ func TestCSSLogging(t *testing.T) {
 
 	}
 
+}
+
+func TestGetCSSLoggingConfiguration(t *testing.T) {
+	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
+	if clusterID == "" {
+		t.Skip("`OS_CSS_CLUSTER_ID` must be defined")
+	}
+
+	client, err := clients.NewCssV1Client()
+	th.AssertNoErr(t, err)
+
+	got, err := logs.GetLogConfiguration(client, clusterID)
+	th.AssertNoErr(t, err)
+	tools.PrintResource(t, got)
+}
+
+func TestUpdateCSSLoggingConfigurations(t *testing.T) {
+	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
+	if clusterID == "" {
+		t.Skip("`OS_CSS_CLUSTER_ID` must be defined")
+	}
+	agency := clients.EnvOS.GetEnv("AGENCY_NAME")
+	if agency == "" {
+		t.Skipf("OS_AGENCY_NAME is required for this test")
+	}
+	bucketName := clients.EnvOS.GetEnv("BUCKET_NAME")
+	if bucketName == "" {
+		t.Skipf("OS_BUCKET_NAME is required for this test")
+	}
+
+	client, err := clients.NewCssV1Client()
+	th.AssertNoErr(t, err)
+
+	updatedOpts := logs.ChangeLogConfigurationOpts{
+		Agency:   agency,
+		Bucket:   bucketName,
+		BasePath: "css/log",
+	}
+
+	err = logs.UpdateLogs(client, clusterID, updatedOpts)
+	th.AssertNoErr(t, err)
 }
