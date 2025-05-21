@@ -6,17 +6,28 @@ import (
 )
 
 type LogConfiguration struct {
-	ID         string `json:"id"`
-	ClusteID   string `json:"clusterId"`
-	ObsBucket  string `json:"obsBucket"`
-	Agency     string `json:"agency"`
-	UpdateAt   int    `json:"updateAt"`
-	BasePath   string `json:"basePath"`
-	AutoEnable bool   `json:"autoEnable"`
-	Period     string `json:"period"`
-	LogSwitch  bool   `json:"logSwitch"`
+	// These parameters are passed to the logs.GetLogConfiguration function.
+	// Log backup ID.
+	ID string `json:"id"`
+	// CSS cluster ID.
+	ClusterID string `json:"clusterId"`
+	// The bucket where the logs should be stored.
+	ObsBucket string `json:"obsBucket"`
+	// The agency name.
+	Agency string `json:"agency"`
+	// Update time.
+	UpdateAt int `json:"updateAt"`
+	// Storage path of backup logs in the OBS bucket.
+	BasePath string `json:"basePath"`
+	// Indicates whether to enable automatic backup.
+	AutoEnable bool `json:"autoEnable"`
+	// Start time of automatic log backup.
+	Period string `json:"period"`
+	// Indicates whether to enable the log function.
+	LogSwitch bool `json:"logSwitch"`
 }
 
+// GetLogConfiguration function will query the details of CSS cluster logging and returns a LogConfiguration object.
 func GetLogConfiguration(client *golangsdk.ServiceClient, clusterID string) (*LogConfiguration, error) {
 	raw, err := client.Get(client.ServiceURL("clusters", clusterID, "logs", "settings"), nil, nil)
 	if err != nil {

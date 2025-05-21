@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -12,7 +11,7 @@ import (
 	th "github.com/opentelekomcloud/gophertelekomcloud/testhelper"
 )
 
-func TestCSSLogging(t *testing.T) {
+func TestCSSLoggingLifecycle(t *testing.T) {
 	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
 	if clusterID == "" {
 		t.Skip("`OS_CSS_CLUSTER_ID` must be defined")
@@ -25,24 +24,27 @@ func TestCSSLogging(t *testing.T) {
 	if bucketName == "" {
 		t.Skipf("OS_BUCKET_NAME is required for this test")
 	}
+	period := clients.EnvOS.GetEnv("LOG_STARTING_PERIOD")
+	if period == "" {
+		t.Skip("`OS_LOG_STARTING_PERIOD` must be defined")
+	}
 
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
 	got, err := logs.GetLogConfiguration(client, clusterID)
 	th.AssertNoErr(t, err)
-	tools.PrintResource(t, got)
-	// log.Print("Creating cluster, ID: ", got)
-	if got.LogSwitch {
-		fmt.Print("The logs are already enabled.")
-		// err = logs.DisableLogs(client, clusterID)
-		// th.AssertNoErr(t, err)
 
-		// print("Cluster logging disabled.")
+	log.Println("CSS log configuration:")
+
+	tools.PrintResource(t, got)
+
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
+
+	if got.LogSwitch {
+		log.Println("The logging has been already enabled.")
 
 	} else {
-
-		log.Println("The logs are not enabled.")
 
 		basicOpts := logs.EnableLogsOptions{
 			Agency:   agency,
@@ -56,14 +58,36 @@ func TestCSSLogging(t *testing.T) {
 		log.Println("Cluster logging enabled.")
 
 		th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
-
-		err = logs.DisableLogs(client, clusterID)
-		th.AssertNoErr(t, err)
-
-		log.Println("Cluster logging disabled.")
-
 	}
 
+	if got.AutoEnable {
+		log.Println("Cluster automatic logging has been already enabled.")
+	} else {
+
+		opts := logs.EnableAutomaticLogsOptions{
+			Period: period,
+		}
+
+		err = logs.EnableAutomaticLogs(client, clusterID, opts)
+		th.AssertNoErr(t, err)
+		log.Println("Cluster automatic logging enabled.")
+
+		th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
+	}
+
+	err = logs.DisableAutomaticLogs(client, clusterID)
+	th.AssertNoErr(t, err)
+
+	log.Println("Cluster automatic logging disabled.")
+
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
+
+	err = logs.DisableLogs(client, clusterID)
+	th.AssertNoErr(t, err)
+
+	log.Println("Cluster logging disabled.")
+
+	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 }
 
 func TestGetCSSLoggingConfiguration(t *testing.T) {
