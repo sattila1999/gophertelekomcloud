@@ -11,7 +11,7 @@ import (
 	th "github.com/opentelekomcloud/gophertelekomcloud/testhelper"
 )
 
-func TestCSSLoggingLifecycle(t *testing.T) {
+func TestCSSLoggingFullLifecycle(t *testing.T) {
 	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
 	if clusterID == "" {
 		t.Skip("`OS_CSS_CLUSTER_ID` must be defined")
@@ -32,7 +32,7 @@ func TestCSSLoggingLifecycle(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	got, err := logs.GetLogConfiguration(client, clusterID)
+	got, err := logs.GetConfiguration(client, clusterID)
 	th.AssertNoErr(t, err)
 
 	log.Println("CSS log configuration:")
@@ -61,24 +61,24 @@ func TestCSSLoggingLifecycle(t *testing.T) {
 	}
 
 	if got.AutoEnable {
-		log.Println("Cluster automatic logging has been already enabled.")
+		log.Println("Cluster automatic backup for CSS logging has been already enabled.")
 	} else {
 
-		opts := logs.EnableAutomaticLogsOptions{
+		opts := logs.EnableAutomaticBackupOpts{
 			Period: period,
 		}
 
-		err = logs.EnableAutomaticLogs(client, clusterID, opts)
+		err = logs.EnableAutomaticBackups(client, clusterID, opts)
 		th.AssertNoErr(t, err)
-		log.Println("Cluster automatic logging enabled.")
+		log.Println("Cluster automatic backup for CSS logging enabled.")
 
 		th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 	}
 
-	err = logs.DisableAutomaticLogs(client, clusterID)
+	err = logs.DisableAutomaticBackups(client, clusterID)
 	th.AssertNoErr(t, err)
 
-	log.Println("Cluster automatic logging disabled.")
+	log.Println("Cluster automatic backup for CSS logging disabled.")
 
 	th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 
@@ -99,7 +99,7 @@ func TestGetCSSLoggingConfiguration(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	got, err := logs.GetLogConfiguration(client, clusterID)
+	got, err := logs.GetConfiguration(client, clusterID)
 	th.AssertNoErr(t, err)
 	tools.PrintResource(t, got)
 }

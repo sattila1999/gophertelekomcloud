@@ -27,8 +27,8 @@ type LogConfiguration struct {
 	LogSwitch bool `json:"logSwitch"`
 }
 
-// GetLogConfiguration function will query the details of CSS cluster logging and returns a LogConfiguration object.
-func GetLogConfiguration(client *golangsdk.ServiceClient, clusterID string) (*LogConfiguration, error) {
+// GetConfiguration function will query the details of CSS cluster logging and returns a LogConfiguration object.
+func GetConfiguration(client *golangsdk.ServiceClient, clusterID string) (*LogConfiguration, error) {
 	raw, err := client.Get(client.ServiceURL("clusters", clusterID, "logs", "settings"), nil, nil)
 	if err != nil {
 		return nil, err

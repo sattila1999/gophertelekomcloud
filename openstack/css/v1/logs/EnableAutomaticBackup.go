@@ -5,14 +5,14 @@ import (
 	"github.com/opentelekomcloud/gophertelekomcloud/internal/build"
 )
 
-type EnableAutomaticLogsOptions struct {
-	// This parameter passed to the logs.EnableAutomaticLogs function.
+type EnableAutomaticBackupOpts struct {
+	// This parameter passed to the logs.EnableAutomaticBackups function.
 	// Period is the start time of a backup job.
 	Period string `json:"period" required:"true"`
 }
 
-// EnableAutomaticLogs will enable the automatic log backup for the cluster based on EnableAutomaticLogsOptions.
-func EnableAutomaticLogs(client *golangsdk.ServiceClient, clusterID string, opts EnableAutomaticLogsOptions) error {
+// EnableAutomaticBackups will enable the automatic log backup policy for the cluster based on EnableAutomaticBackupOpts.
+func EnableAutomaticBackups(client *golangsdk.ServiceClient, clusterID string, opts EnableAutomaticBackupOpts) error {
 	b, err := build.RequestBody(opts, "")
 	if err != nil {
 		return err
