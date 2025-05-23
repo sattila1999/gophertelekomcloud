@@ -5,7 +5,7 @@ import (
 	"github.com/opentelekomcloud/gophertelekomcloud/internal/build"
 )
 
-type EnableLogsOptions struct {
+type EnableLogsOpts struct {
 	// These parameters are passed to the logs.EnableLogs function.
 	// Agency is the agency name used for the css cluster.
 	Agency string `json:"agency" required:"true"`
@@ -15,8 +15,8 @@ type EnableLogsOptions struct {
 	Bucket string `json:"logBucket" required:"true"`
 }
 
-// EnableLogs function is used to enable the log switch of a CSS cluster base on EnableLogsOptions.
-func EnableLogs(client *golangsdk.ServiceClient, clusterID string, opts EnableLogsOptions) error {
+// EnableLogs function is used to enable the log switch of a CSS cluster base on EnableLogsOpts.
+func EnableLogs(client *golangsdk.ServiceClient, clusterID string, opts EnableLogsOpts) error {
 	b, err := build.RequestBody(opts, "")
 	if err != nil {
 		return err

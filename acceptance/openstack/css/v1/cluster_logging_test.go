@@ -46,7 +46,7 @@ func TestCSSLoggingFullLifecycle(t *testing.T) {
 
 	} else {
 
-		basicOpts := logs.EnableLogsOptions{
+		basicOpts := logs.EnableLogsOpts{
 			Agency:   agency,
 			Bucket:   bucketName,
 			BasePath: "css/log",
@@ -121,7 +121,7 @@ func TestUpdateCSSLoggingConfigurations(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	updatedOpts := logs.ChangeLogConfigurationOpts{
+	updatedOpts := logs.UpdateLogConfigurationOpts{
 		Agency:   agency,
 		Bucket:   bucketName,
 		BasePath: "css/log",

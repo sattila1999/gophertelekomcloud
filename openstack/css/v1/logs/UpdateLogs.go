@@ -5,7 +5,7 @@ import (
 	"github.com/opentelekomcloud/gophertelekomcloud/internal/build"
 )
 
-type ChangeLogConfigurationOpts struct {
+type UpdateLogConfigurationOpts struct {
 	// These parameters are passed to the logs.UpdateLogs function.
 	// Agency is the agency name used for the css cluster.
 	Agency string `json:"agency" required:"true"`
@@ -15,8 +15,8 @@ type ChangeLogConfigurationOpts struct {
 	Bucket string `json:"logBucket" required:"true"`
 }
 
-// UpdateLogs will change the cluster logging configurations based on ChangeLogConfigurationOpts.
-func UpdateLogs(client *golangsdk.ServiceClient, clusterID string, opts ChangeLogConfigurationOpts) error {
+// UpdateLogs will change the cluster logging configurations based on UpdateLogConfigurationOpts.
+func UpdateLogs(client *golangsdk.ServiceClient, clusterID string, opts UpdateLogConfigurationOpts) error {
 	b, err := build.RequestBody(opts, "")
 	if err != nil {
 		return err
