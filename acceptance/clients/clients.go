@@ -6,6 +6,8 @@ package clients
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"regexp"
 	"strings"
 
 	golangsdk "github.com/opentelekomcloud/gophertelekomcloud"
@@ -38,6 +40,20 @@ func NewAutoscalingV2Client() (*golangsdk.ServiceClient, error) {
 	}
 
 	return openstack.NewAutoScalingV2(cc.ProviderClient, golangsdk.EndpointOpts{
+		Region: cc.RegionName,
+	})
+}
+
+// NewASMV1Client returns a *ServiceClient for making calls
+// to the OpenStack ASM v1 API. An error will be returned
+// if authentication or client creation was not possible.
+func NewASMV1Client() (*golangsdk.ServiceClient, error) {
+	cc, err := CloudAndClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewASMV1(cc.ProviderClient, golangsdk.EndpointOpts{
 		Region: cc.RegionName,
 	})
 }
@@ -502,6 +518,18 @@ func NewNatV2Client() (*golangsdk.ServiceClient, error) {
 	})
 }
 
+// NewNatV3Client returns authenticated NAT v2 client
+func NewNatV3Client() (*golangsdk.ServiceClient, error) {
+	cc, err := CloudAndClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewNatV3(cc.ProviderClient, golangsdk.EndpointOpts{
+		Region: cc.RegionName,
+	})
+}
+
 // NewPeerNetworkV2Client returns a *ServiceClient for making calls to the
 // OpenStack Networking v2 API for Peer. An error will be returned if authentication
 // or client creation was not possible.
@@ -883,15 +911,53 @@ func NewSmnV2TagsClient() (client *golangsdk.ServiceClient, err error) {
 }
 
 // NewTmsV1Client returns authenticated TMS v1.0 client
-func NewTmsV1Client() (client *golangsdk.ServiceClient, err error) {
-	iamClient, err := NewIdentityV3AdminClient()
+func NewTmsV1Client() (*golangsdk.ServiceClient, error) {
+	client, err := NewIdentityV3AdminClient()
 	if err != nil {
 		return nil, err
 	}
 
-	iamClient.Endpoint = strings.Replace(iamClient.Endpoint, "v3", "v1.0", 1)
-	iamClient.Endpoint = strings.Replace(iamClient.Endpoint, "iam", "tms", 1)
-	return iamClient, err
+	parsedURL, err := url.Parse(client.Endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse IAM endpoint: %w", err)
+	}
+	re := regexp.MustCompile(`^[^.]+`)
+	parsedURL.Host = re.ReplaceAllString(parsedURL.Host, "tms")
+	segments := strings.Split(parsedURL.Path, "/")
+	if len(segments) > 1 {
+		segments[1] = "v1.0"
+	}
+	parsedURL.Path = strings.Join(segments, "/")
+
+	client.Endpoint = parsedURL.String()
+	client.ResourceBase = client.Endpoint
+	client.Type = "tms"
+	return client, nil
+}
+
+// NewTmsV2Client returns authenticated TMS v2.0 client
+func NewTmsV2Client() (*golangsdk.ServiceClient, error) {
+	client, err := NewIdentityV3AdminClient()
+	if err != nil {
+		return nil, err
+	}
+
+	parsedURL, err := url.Parse(client.Endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse IAM endpoint: %w", err)
+	}
+	re := regexp.MustCompile(`^[^.]+`)
+	parsedURL.Host = re.ReplaceAllString(parsedURL.Host, "tms")
+	segments := strings.Split(parsedURL.Path, "/")
+	if len(segments) > 1 {
+		segments[1] = "v2.0"
+	}
+	parsedURL.Path = strings.Join(segments, "/")
+
+	client.Endpoint = parsedURL.String()
+	client.ResourceBase = client.Endpoint
+	client.Type = "tms"
+	return client, nil
 }
 
 // NewCesV1Client returns authenticated CES v1 client
@@ -967,6 +1033,15 @@ func NewGaussDBClient() (client *golangsdk.ServiceClient, err error) {
 	}
 
 	return openstack.NewGaussDBV3(cc.ProviderClient, golangsdk.EndpointOpts{})
+}
+
+func NewTaurusDBV3Client() (client *golangsdk.ServiceClient, err error) {
+	cc, err := CloudAndClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return openstack.NewTaurusDBV3(cc.ProviderClient, golangsdk.EndpointOpts{})
 }
 
 // NewAPIGWClient returns authenticated APIGW v2 client
