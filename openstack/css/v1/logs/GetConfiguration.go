@@ -46,6 +46,10 @@ type RealTimeLogConfiguration struct {
 	UpdateAt int `json:"updateAt"`
 }
 
+type getOpts struct {
+	Action string `q:"action"`
+}
+
 // GetBaseLogConfiguration will return the base log collect configurations.
 func GetBaseLogConfiguration(client *golangsdk.ServiceClient, clusterID string) (interface{}, error) {
 	action := "base_log_collect"
@@ -60,15 +64,24 @@ func GetRealTimeLogConfiguration(client *golangsdk.ServiceClient, clusterID stri
 
 // GetConfiguration function will query the details of CSS cluster logging and returns a LogConfiguration object.
 func GetConfiguration(client *golangsdk.ServiceClient, clusterID string, action *string) (interface{}, error) {
-	url := client.ServiceURL("clusters", clusterID, "logs", "settings")
+	// url := client.ServiceURL("clusters", clusterID, "logs", "settings")
 
-	if action != nil && *action != "" {
-		url += "?action=" + *action
+	// if action != nil && *action != "" {
+	// 	url += "?action=" + *action
+	// }
+
+	queryParam := getOpts{
+		Action: *action,
 	}
 
-	println(url)
+	url, err := golangsdk.NewURLBuilder().
+		WithEndpoints("clusters", clusterID, "logs", "settings").
+		WithQueryParams(&queryParam).Build()
+	if err != nil {
+		return nil, err
+	}
 
-	raw, err := client.Get(url, nil, nil)
+	raw, err := client.Get(client.ServiceURL(url.String()), nil, nil)
 	if err != nil {
 		return nil, err
 	}

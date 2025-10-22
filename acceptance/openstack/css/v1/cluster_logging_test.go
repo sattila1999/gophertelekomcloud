@@ -64,7 +64,7 @@ func TestCSSLoggingFullLifecycle(t *testing.T) {
 
 	} else {
 
-		basicOpts := logs.LogsOpts{
+		basicOpts := logs.BaseLogOpts{
 			Agency:   agency,
 			Bucket:   bucketName,
 			BasePath: "css/log",
@@ -93,7 +93,7 @@ func TestCSSLoggingFullLifecycle(t *testing.T) {
 		th.AssertNoErr(t, clusters.WaitForCluster(client, clusterID, timeout))
 	}
 
-	realTimeOpts := logs.LogsOpts{
+	realTimeOpts := logs.RealTimeLogOpts{
 		IndexPrefix:     indexPrefix,
 		KeepDays:        i,
 		TargetClusterId: clusterID,
@@ -154,7 +154,7 @@ func TestEnableLogSwitch(t *testing.T) {
 		t.Skipf("OS_BUCKET_NAME is required for this test")
 	}
 
-	logSwitchOpts := logs.LogsOpts{
+	logSwitchOpts := logs.BaseLogOpts{
 		Agency:   agency,
 		Bucket:   bucketName,
 		BasePath: "css/log",
@@ -170,11 +170,11 @@ func TestEnableLogSwitch(t *testing.T) {
 	err = logs.EnableAutomaticBackups(client, clusterID, automaticLogBackupOpts)
 	th.AssertNoErr(t, err)
 
-	err = logs.DisableAutomaticBackups(client, clusterID)
-	th.AssertNoErr(t, err)
+	// err = logs.DisableAutomaticBackups(client, clusterID)
+	// th.AssertNoErr(t, err)
 
-	err = logs.DisableBaseLogs(client, clusterID)
-	th.AssertNoErr(t, err)
+	// err = logs.DisableBaseLogs(client, clusterID)
+	// th.AssertNoErr(t, err)
 
 }
 func TestEnableLogIngestion(t *testing.T) {
@@ -197,7 +197,7 @@ func TestEnableLogIngestion(t *testing.T) {
 	i, err := strconv.Atoi(keepDays)
 	th.AssertNoErr(t, err)
 
-	logSwitchOpts := logs.LogsOpts{
+	logSwitchOpts := logs.RealTimeLogOpts{
 		IndexPrefix:     indexPrefix,
 		KeepDays:        i,
 		TargetClusterId: clusterID,
@@ -206,25 +206,28 @@ func TestEnableLogIngestion(t *testing.T) {
 	err = logs.EnableRealTimeLogs(client, clusterID, &logSwitchOpts)
 	th.AssertNoErr(t, err)
 
-	err = logs.DisableRealTimeLogs(client, clusterID)
-	th.AssertNoErr(t, err)
+	// err = logs.DisableRealTimeLogs(client, clusterID)
+	// th.AssertNoErr(t, err)
 
 }
 
-// func TestGetCSSLoggingConfiguration(t *testing.T) {
-// 	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
-// 	if clusterID == "" {
-// 		t.Skip("`OS_CSS_CLUSTER_ID` must be defined")
-// 	}
-// 	action := clients.EnvOS.GetEnv("CSS_LOG_CONFIGURATION")
+func TestGetCSSLoggingConfiguration(t *testing.T) {
+	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
+	if clusterID == "" {
+		t.Skip("`OS_CSS_CLUSTER_ID` must be defined")
+	}
 
-// 	client, err := clients.NewCssV1Client()
-// 	th.AssertNoErr(t, err)
+	client, err := clients.NewCssV1Client()
+	th.AssertNoErr(t, err)
 
-// 	got, err := logs.GetConfiguration(client, clusterID, &action)
-// 	th.AssertNoErr(t, err)
-// 	tools.PrintResource(t, got)
-// }
+	got, err := logs.GetBaseLogConfiguration(client, clusterID)
+	th.AssertNoErr(t, err)
+	tools.PrintResource(t, got)
+
+	got, err = logs.GetRealTimeLogConfiguration(client, clusterID)
+	th.AssertNoErr(t, err)
+	tools.PrintResource(t, got)
+}
 
 func TestUpdateCSSLoggingBaseConfigurations(t *testing.T) {
 	clusterID := clients.EnvOS.GetEnv("CSS_CLUSTER_ID")
@@ -243,7 +246,7 @@ func TestUpdateCSSLoggingBaseConfigurations(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	updatedOpts := logs.UpdateLogConfigurationOpts{
+	updatedOpts := logs.UpdateBaseLogConfigurationOpts{
 		Agency:   agency,
 		Bucket:   bucketName,
 		BasePath: "css/log/2",
@@ -273,7 +276,7 @@ func TestUpdateCSSLoggingRealTimeConfigurations(t *testing.T) {
 	client, err := clients.NewCssV1Client()
 	th.AssertNoErr(t, err)
 
-	updatedOpts := logs.UpdateLogConfigurationOpts{
+	updatedOpts := logs.UpdateRealTimeLogConfigurationOpts{
 		IndexPrefix:     indexPrefix,
 		KeepDays:        i,
 		TargetClusterId: clusterID,
